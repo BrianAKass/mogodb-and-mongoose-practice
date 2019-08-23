@@ -1,0 +1,174 @@
+First things first make sure you have hyper setup and copy paste config settings from this link https://gist.github.com/coco-napky/404220405435b3d0373e37ec43e54a23 into hyper's preferences. also google for hyper not hyper terminal. You'll get the wrong thing. from there run mongod in one tab and move around in the other.
+
+type mongo in the new tab. then type help if you forget syntax. 
+
+show dbs is as good a start as any
+
+"use shopDB" creates new db won't show up when u say show dbs gotta fill it with content first. CRUD time. In case u forget somehow C.reate R.ead U.pdate and D.elete
+
+"db" will tell you what database u currently are in
+
+MongoDB provides the following methods to insert documents into a collection:
+
+db.collection.insertOne() New in version 3.2
+db.collection.insertMany() New in version 3.2
+
+in our example:
+
+db.products.insertOne({_id:1, name: "Pen", price: 1.20})
+
+we can now see whats in ourdb database when we write show colections. 
+
+Now we read them. db.collection.find()
+
+db.products.find() shows all our entries
+
+to narrow the search we use query
+
+db.products.find({name: "Pencil"})
+
+
+
+"db.collection.find(query, projection)" Projection Specifies and filters what you what to return.
+
+db.products.find({_id:1}, {name:1})
+
+db.products.find({_id:1}, {name:1, _id:0}) makes it return only the name and not the ID.
+
+
+Updating.
+
+db.collection.updateOne() New in version 3.2
+db.collection.updateMany() New in version 3.2
+db.collection.replaceOne() New in version 3.2
+
+
+db.products.updateOne({_id:1},{$set:{stock: 32}}) first arg is the thing u want updated, and the second is what you are updating. now lets update the other
+
+db.products.updateOne({_id:2},{$set:{stock: 12}})
+
+now to delete. 
+
+db.collection.deleteOne() New in version 3.2
+db.collection.deleteMany() New in version 3.2
+
+db.products.deleteOne({name:pencil})
+
+Database relationships
+
+first way (what most use) lets say we want an eraser added
+
+db.products.insert(
+{
+_id:3,
+name: "Eraser",
+price: 1.30,
+stock: 43,
+reviews: [
+{
+authorName:"Sally",
+rating:5,
+review:"It works"
+},
+{
+authorName:"John",
+rating:5,
+review:"Best eraser ever."
+}
+]
+}
+)
+
+lets do the same for the pencil we deleted earlier.
+
+
+db.products.insert(
+{
+_id:2,
+name: "pencil",
+price: 0.80,
+stock: 12,
+reviews: [
+{
+authorName:"Sally",
+rating:5,
+review:"Needed a pencil for my eraser. This one is great"
+},
+{
+authorName:"John",
+rating:5,
+review:"Great action movie prop. Surprisingly effective."
+}
+]
+}
+)
+
+for things like this you will need the editor to clean up your work. 
+
+
+A different format you might see in the wild is 
+
+{
+	_id:1,
+	name:"Pen",
+	price:1.20,
+	stock:32
+}
+
+{
+	_id:2,
+	name:"Pencil"
+	price:0.80,
+	stock:12
+}
+
+{
+	orderNumber:3243,
+	productsOrdered: [1,2],
+}
+
+This layout has unique IDs and then you document the order number and which orders based on ID. 
+
+
+
+MongoDB with Node.JS
+
+We can do it the hard way Using straight up mongoDB driver or mongoose. Guess which one we are using?
+
+https://mongodb.github.io/node-mongodb-native/3.2/quick-start/quick-start/
+
+Let's humor hard mode first. check the app.js in the examples folder from there. make sure mongod is running in your terminal still while doing this stuff and install the proper Node packages. From there copy paste whats in the documentation and replace the new mongo client line with this.
+
+const client = new MongoClient(url, {useNewUrlParser: true, useUnifiedTopology: true });
+
+now that our server is running we can add data in our database check the copy paste in the documentation. Should be striaghtforward because you commented your code so future you gets a break. 
+
+we then paste that function into our connect to server method (scroll own in the documentation incase you forget what that looks like.)
+
+check nodemon for the consolelog. Fingers crossed and success. now check the mongo terminal tab
+
+show dbs 
+
+use fruitsdb
+
+show collections
+
+db.fruits.find()
+
+awesome that's working but how do we get our code to read it for us? scroll down for find all documents. 
+
+
+okay now that all of that is settled lets play with mongoose. 
+
+first lets get rid of the old DB select it with use then drop it
+
+
+show dbs
+
+use fruitsdb
+
+db.dropDatabase()
+
+show dbs
+
+now we delete the old code add the new mongoose params Check the documentation... looks like we replaced quite a few lines! 
