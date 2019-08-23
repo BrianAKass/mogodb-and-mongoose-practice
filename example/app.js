@@ -34,7 +34,9 @@ const fruit = new Fruit ({
 
 const personSchema = new mongoose.Schema ({
     name: String,
-    age: Number
+    age: Number,
+    //establish relationship
+    favoriteFruit: fruitSchema,
 });
 
 const Person = mongoose.model("Person", personSchema);
@@ -44,7 +46,31 @@ const person = new Person ({
     age:35,
 });
 
-// person.save()
+const pineapple = new Fruit({
+    name:"Pineapple",
+    rating:10,
+    review:"favorite fruit"
+});
+
+//pineapple.save();
+
+const cherries = new Fruit ({
+    name:"Cherries",
+    rating: 9,
+    review: "avoid the pits and it's great"
+});
+
+//cherries.save();
+
+const amy = new Person ({
+    name:"Amy",
+    age:25,
+    favoriteFruit: pineapple,
+});
+
+//amy.save();
+
+//person.save();
 
 const kiwi = new Fruit ({
     name: "Kiwi",
@@ -73,7 +99,7 @@ const banana = new Fruit ({
 // });
 
 
-// Fruit.updateOne({_id:"5d600582aa1b8afcdf0be858"}, {name:"strawberry"},(err)=>{
+// Person.updateOne({name:"John"}, {favoriteFruit: cherries},(err)=>{
 //     if (err) {
 //         console.log(err);
 //     }else{
@@ -81,7 +107,7 @@ const banana = new Fruit ({
 //     }
 // });
 
-// Fruit.deleteOne({_id: "5d5ffca6d79e870178070712"},(err)=>{
+// Fruit.deleteOne({_id: 'ObjectId("5d601e2be401b717e406ca36")'},(err)=>{
 //     if (err) {
 //         console.log(err);
 //     } else {
@@ -90,13 +116,13 @@ const banana = new Fruit ({
 // });
 
 
-Person.deleteMany({name: /John/ },(err)=>{
-    if (err) {
-        console.log(err);
-    } else {
-        console.log('Deleted file');
-    }
-});
+// Person.deleteMany({name: /Amy/ },(err)=>{
+//     if (err) {
+//         console.log(err);
+//     } else {
+//         console.log('Deleted file');
+//     }
+// });
 
 //Looking for items in the database. post last to check all updates
 Fruit.find((err,fruits)=>{
@@ -111,3 +137,5 @@ Fruit.find((err,fruits)=>{
     //close node when finished
     mongoose.connection.close();
 });
+
+
