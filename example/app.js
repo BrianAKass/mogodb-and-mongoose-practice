@@ -1,12 +1,13 @@
 //Commented out code to toggle options. 
-
+const axios = require('axios');
+const cheerio = require('cheerio');
 
 ////////mongoose way
 const mongoose = require('mongoose');
 ///mongoose! 
 mongoose.connect('mongodb://localhost:27017/fruitsdb', {useNewUrlParser: true}); // add the / and the name of the db
 
-
+// Setup the template here 
 const fruitSchema = new mongoose.Schema ({
     name: {
         type:String,
@@ -21,7 +22,7 @@ const fruitSchema = new mongoose.Schema ({
     },
     review: String,
 });
-
+//setup the specific model
 const Fruit = mongoose.model("Fruit", fruitSchema);
 
 const fruit = new Fruit ({
@@ -89,6 +90,50 @@ const banana = new Fruit ({
     rating:5,
     review:"food",
 });
+
+const amazonSchema = new mongoose.Schema ({
+    link: String,
+    productName: String,
+    price: String,
+    rating: String,
+    numReviews: String,
+    prodImg:String,
+});
+
+const Amazon = mongoose.model("Amazon", amazonSchema);
+
+axios.get(`https://amzn.to/2Hnb6f6`)
+  .then((res)=> {
+    const html = res.data;
+    const $ = cheerio.load(html);
+    const asinURL = "https://www.amazon.com/dp/"+$("#cerberus-data-metrics").attr('data-asin') + "/?tag=friftr-20";
+    const product = $("#productTitle").html().replace(/\s\s+/g, '');
+    const howMuch = $("#priceblock_ourprice").text();
+    const stars = $('#centerCol #acrPopover').text().replace(/\s\s+/g, '');
+    const revCount = $('#centerCol #acrCustomerReviewText').text().replace(/\s\s+/g, '');
+    const picLink = $('#landingImage').attr('data-old-hires'); 
+
+    const newItem = new Amazon ({
+        link: asinURL,
+        productTitle: product,
+        price: howMuch,
+        rating: stars,
+        numReviews: revCount,
+        prodImg:picLink,
+    });
+
+    newItem.save();
+  })
+  .catch(function (error) {
+    // handle error
+    console.log(error);
+  })
+  .finally(function () {
+    // always executed
+  });
+
+
+
 
 // Fruit.insertMany([apple, kiwi, banana],(er)=>{
 //     if (er){
